@@ -708,7 +708,19 @@
         "university"
       ],
       "icon": "https://data.aoe4world.com/images/technologies/counterweight-defenses-4.png",
-      "effects": []
+      "effects": [
+        {
+          "property": "burst",
+          "select": {
+            "id": [
+              "counterweight-trebuchet"
+            ]
+          },
+          "effect": "change",
+          "value": 1,
+          "type": "passive"
+        }
+      ]
     },
     {
       "id": "court-architects-4",
