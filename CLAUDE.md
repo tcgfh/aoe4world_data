@@ -255,12 +255,25 @@ invisible and produce confidently wrong answers:
 | `untargeted-effect` | effect has no selector at all (the `float_properties` fallback in `parse.ts`) — **excluded** from the maths |
 | `dangling-selector` | selector names a `baseId` that exists nowhere — looks well-formed, matches nothing |
 | `unknown-property` | `placeholderAbility` output; not applied |
+| `landmark-exclusive` | tech is only researchable at a landmark that has same-age rivals, so it is a build choice, not a given |
 
 The canonical example: Templar "Counterweight Defenses" (+1 trebuchet projectile — the
 largest single term in that unit's damage) is `unmodelled`, so a naive query scores it
 as a no-op and reports the wrong civ as strongest. Conversely, Templar "Kingdom of
 Poland" is `untargeted`, so a naive query stacks ×1.5 onto a trebuchet. Trust the
 warnings before trusting the numbers.
+
+`landmark-exclusive` is the subtlest: a civ builds one landmark per age, so
+"fully upgraded" is a *choice*, not a ceiling. **52 technologies with real effects are
+landmark-contingent.** Rus "Siege Crew Training" (instant siege setup/teardown) needs
+the High Armory and is forgone if the civ takes the Spasskaya Tower. The warning fires
+only when a same-age rival exists — the Abbasid House of Wisdom is always built, so its
+technologies are unconditional and are not flagged.
+
+Not to be confused with the Mongol `(Improved)` technologies, which are **not**
+landmark-gated: `ability-ovoo-influence` grants "buildings within influence have access
+to double production and improved technology", so e.g. Geometry (Improved) is researched
+at an ordinary siege-workshop inside Ovoo influence, at double cost.
 
 ## Conventions
 

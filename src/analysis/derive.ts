@@ -42,7 +42,7 @@ export type Stacking = "base" | "total";
 export type DamageTarget = "unit" | "building" | "naval";
 
 export interface Warning {
-  kind: "unmodelled" | "unknown-property" | "untargeted-effect" | "dangling-selector" | "interval-mismatch";
+  kind: "unmodelled" | "unknown-property" | "untargeted-effect" | "dangling-selector" | "landmark-exclusive" | "interval-mismatch";
   subject: string;
   detail: string;
 }
@@ -152,6 +152,27 @@ export function danglingIds(m: Modifier): string[] {
   return (m.select?.id ?? []).filter((id) => !known.has(id));
 }
 
+let landmarkIds: Set<string> | undefined;
+/** Every landmark/wonder baseId. */
+export function landmarks(): Set<string> {
+  return (landmarkIds ??= new Set(data.buildings.filter((b) => b.classes.includes("landmark") || b.classes.includes("wonder")).map((b) => b.baseId)));
+}
+
+/** Technologies researchable *only* at a landmark, and therefore contingent on that
+ *  landmark being the one chosen for its age. */
+export function landmarkExclusive(techs: Technology[]): Technology[] {
+  const lm = landmarks();
+  return techs.filter((t) => (t.producedBy ?? []).length > 0 && (t.producedBy ?? []).every((p) => lm.has(p)));
+}
+
+/** The other landmarks a civ could build in the same age as any of `producers` — i.e.
+ *  what it gives up to gain access to a landmark-exclusive technology. */
+export function sameAgeLandmarkRivals(producers: string[], civ: string): string[] {
+  const lm = landmarks();
+  const ages = new Set(data.buildings.filter((b) => producers.includes(b.baseId) && b.civs.includes(civ as any)).map((b) => b.age));
+  return [...new Set(data.buildings.filter((b) => b.civs.includes(civ as any) && lm.has(b.baseId) && ages.has(b.age) && !producers.includes(b.baseId)).map((b) => b.baseId))];
+}
+
 /** Technologies for `civ` that mention the item by name but declare no effects at all.
  *
  * An empty `effects: []` is indistinguishable from "does nothing", so a naive query
@@ -223,6 +244,23 @@ export function analyse(baseId: string, civInput: string): AnalysisResult {
 
   const techs = technologiesAffecting(unit, civ.abbr);
   const warnings: Warning[] = [];
+
+  // A civ builds one landmark per age, so techs exclusive to a landmark are NOT
+  // simultaneously available with those of its same-age rivals: "fully upgraded" is a
+  // choice, not a ceiling. Rus "Siege Crew Training" (instant siege setup/teardown) is
+  // the clean example — it needs the High Armory, forgoing the Spasskaya Tower.
+  for (const t of landmarkExclusive(techs)) {
+    const at = t.producedBy ?? [];
+    const rivals = sameAgeLandmarkRivals(at, civ.abbr);
+    // No same-age rival means the landmark is always built (e.g. the Abbasid House of
+    // Wisdom), so the tech is unconditional and there is nothing to warn about.
+    if (!rivals.length) continue;
+    warnings.push({
+      kind: "landmark-exclusive",
+      subject: t.name,
+      detail: `only researchable at ${at.join(" / ")}, so it is forgone if the civ takes ${rivals.join(" or ")} instead — counted here, but it is a landmark choice rather than a given`,
+    });
+  }
 
   const modifiers: Modifier[] = [];
   for (const t of techs)
