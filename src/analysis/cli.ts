@@ -28,6 +28,9 @@ const travel = Number(flag("travel", "0"));
 const pad = (s: any, n: number) => String(s).padEnd(n);
 const num = (s: any, n: number) => String(s).padStart(n);
 const round = (n: number) => Math.round(n * 10) / 10;
+// Multipliers need 2dp: rounding 1.25 to one decimal prints "x1.3", which reads as a
+// different upgrade tier and has already caused a wrong claim about Chemistry.
+const mult = (n: number) => "x" + Math.round(n * 100) / 100;
 
 function printWarnings(warnings: Warning[]) {
   if (!warnings.length) return;
@@ -70,7 +73,7 @@ function unitCommand() {
   for (const w of r.weapons) {
     console.log(`\n  ${w.name} (${w.type})`);
     console.log(`    ${w.projectiles} projectile(s) x ${w.baseDamage} damage, one volley per ${w.interval}s`);
-    console.log(`    upgrades: x${round(w.multiplier)} multiplier, ${w.flatBonus >= 0 ? "+" : ""}${w.flatBonus} flat`);
+    console.log(`    upgrades: ${mult(w.multiplier)} multiplier, ${w.flatBonus >= 0 ? "+" : ""}${w.flatBonus} flat`);
     console.log(`    ${pad("target", 10)}${num("volley", 16)}${num("dps", 16)}`);
     for (const t of ["unit", "building", "naval"] as DamageTarget[]) {
       const p = w.perTarget[t];
@@ -140,7 +143,7 @@ function rankCommand() {
     const truncated = civs.length > 39;
     console.log(
       `  ${pad(truncated ? `${g.civs.length} civs` : civs, 40)}${pad(g.row.unit.slice(0, 23), 24)}${num(g.row.result.unit.age, 4)}${num(w.projectiles, 5)}${num(w.baseDamage, 6)}` +
-        `${num("x" + round(w.multiplier), 7)}${num(w.interval, 8)}${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(g.dps), 8)}`,
+        `${num(mult(w.multiplier), 7)}${num(w.interval, 8)}${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(g.dps), 8)}`,
     );
     // producedBy is the difference that matters for landmark units - the French build
     // the Royal Cannon at the College of Artillery in Castle, Byzantines only via the
