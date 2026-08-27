@@ -2696,28 +2696,28 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // "Inspired Villagers gather resources +10% faster and construct buildings and defenses +25% quicker.
     {
       property: "goldGatherRate",
-      select: { id: ["villagers"] },
+      select: { id: ["villager"] },
       effect: "multiply",
       value: increaseByPercent(1, g),
       type: "influence",
     },
     {
       property: "foodGatherRate",
-      select: { id: ["villagers"] },
+      select: { id: ["villager"] },
       effect: "multiply",
       value: increaseByPercent(1, g),
       type: "influence",
     },
     {
       property: "woodGatherRate",
-      select: { id: ["villagers"] },
+      select: { id: ["villager"] },
       effect: "multiply",
       value: increaseByPercent(1, g),
       type: "influence",
     },
     {
       property: "stoneGatherRate",
-      select: { id: ["villagers"] },
+      select: { id: ["villager"] },
       effect: "multiply",
       value: increaseByPercent(1, g),
       type: "influence",
@@ -3590,9 +3590,9 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
           "archer",
           "arbaletrier",
           "crossbowman",
-          "tower-elepahnt",
+          "tower-elephant",
           "mangudai",
-          "khaganate-elite-mangudai",
+          "khaganate-mangudai",
           "khaganate-horse-archer",
           "horse-archer",
           "camel-archer",
@@ -4309,7 +4309,7 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // Increase the Gold income from Traders by +30%.
     {
       property: "goldGatherRate",
-      select: { id: ["traders"] },
+      select: { id: ["trader"] },
       effect: "multiply",
       value: increaseByPercent(1, i),
       type: "passive",
@@ -4620,8 +4620,11 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     ([i, d]) => [
     // Increase damage of Trebuchets by +20%.\nIf Geometry has already been researched, increase their damage by +10% instead.
     {
-      property: "rangedAttack",
-      select: { id: ["huihui-pao", "trebuchet"] },
+      // Trebuchets are siege weapons, and the base "geometry" modifier above uses
+      // siegeAttack — rangedAttack here matched nothing, as did the id "trebuchet"
+      // (the real baseIds are counterweight-trebuchet / traction-trebuchet).
+      property: "siegeAttack",
+      select: { id: ["huihui-pao", "counterweight-trebuchet", "traction-trebuchet"] },
       effect: "multiply",
       value: increaseByPercentImproved(1, i, d),
       type: "passive",
@@ -4711,7 +4714,7 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // Increase the ranged damage of Mangudai and the Khan by +1.
     {
       property: "rangedAttack",
-      select: { id: ["khan", "mangudai", "khaganate-elite-mangudai"] },
+      select: { id: ["khan", "mangudai", "khaganate-mangudai"] },
       effect: "change",
       value: i,
       type: "passive",
@@ -4726,7 +4729,7 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // If Siha Bow Limbs has already been researched, increase the ranged damage of Mangudai and the Khan by + 1.
     {
       property: "rangedAttack",
-      select: { id: ["khan", "mangudai", "khaganate-elite-mangudai"] },
+      select: { id: ["khan", "mangudai", "khaganate-mangudai"] },
       effect: "change",
       value: i - d,
       type: "passive",
@@ -5425,7 +5428,7 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // Increases Town Center health by +1000, adds an additional arrow slit, and adds an aura which enhances Villagers harvest rate from Farms by +25%.
     {
       property: "hitpoints",
-      select: { id: ["town-center", "capital-towncenter"] },
+      select: { id: ["town-center", "capital-town-center"] },
       effect: "change",
       value: hp,
       type: "passive",
@@ -5447,14 +5450,14 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // Increases Town Center health by +2000, fire armor by +2, adds an additional arrow slit, and adds an aura which enhances Villagers harvest rate from Farms by +50%.
     {
       property: "hitpoints",
-      select: { id: ["town-center", "capital-towncenter"] },
+      select: { id: ["town-center", "capital-town-center"] },
       effect: "change",
       value: hp,
       type: "passive",
     },
     {
       property: "fireArmor",
-      select: { id: ["town-center", "capital-towncenter"] },
+      select: { id: ["town-center", "capital-town-center"] },
       effect: "change",
       value: fa,
       type: "passive",
@@ -5476,14 +5479,14 @@ export const technologyModifiers: Record<string, EffectsFactory> = {
     // Increases Town Center health by +3000, fire armor by +3, adds an aura which enhances Villagers harvest rate from Farms by +75%, and equips a Rocket Emplacement.
     {
       property: "hitpoints",
-      select: { id: ["town-center", "capital-towncenter"] },
+      select: { id: ["town-center", "capital-town-center"] },
       effect: "change",
       value: hp,
       type: "passive",
     },
     {
       property: "fireArmor",
-      select: { id: ["town-center", "capital-towncenter"] },
+      select: { id: ["town-center", "capital-town-center"] },
       effect: "change",
       value: fa,
       type: "passive",

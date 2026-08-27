@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "parse": "ts-node ./src/attrib/run.ts",
+    "analyse": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON ./src/analysis/cli.ts",
     "build": "echo \"The build command is deprecated, use parse instead\" && yarn run parse",
     "format": "prettier --write ./src"
   },

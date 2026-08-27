@@ -59,7 +59,11 @@ yarn install
 yarn parse            # ts-node ./src/attrib/run.ts — regenerates ALL data + icons
 yarn build            # deprecated alias for `yarn parse`
 yarn format           # prettier --write ./src  (printWidth 180, configured in package.json)
+yarn analyse …        # derived-stat queries over the committed JSON (needs Node >= 22.6)
 ```
+
+`yarn analyse` is the one command that works **without** `source/`, since it reads the
+generated JSON rather than the game files. See "Querying derived stats" below.
 
 There is **no test suite and no typecheck script**. Verification is done by reading the
 git diff of the generated JSON (see "Verifying a data change" below).
@@ -215,6 +219,49 @@ git diff -- units/all-optimized.json   # what the SDK actually serves
 A targeted fix should produce a small, explainable diff. If a one-line workaround
 changes thousands of lines, the predicate is too broad.
 
+## Querying derived stats
+
+The published JSON is item-centric: it stores canonical per-item records but **not**
+derived stats (DPS, attack interval), **not** any reverse link from an item to the
+technologies that modify it, and **not** the semantics for how modifiers compose.
+`src/analysis/` derives all three on top of the committed data without touching the
+parser or the published schema.
+
+```bash
+yarn analyse unit  counterweight-trebuchet templar     # derived stats, one unit + civ
+yarn analyse rank  counterweight-trebuchet             # every civ, ranked by DPS
+yarn analyse techs counterweight-trebuchet templar     # what modifies it
+# flags: --target unit|building|naval   --stacking base|total
+```
+
+- `derive.ts` holds the logic (selector matching, the reverse index, stat derivation);
+  `cli.ts` is only presentation. Import `derive.ts` directly for ad-hoc queries.
+- Runs on plain Node via native type stripping — no `ts-node`, no `node_modules`. It
+  resolves the repo root by walking up for `units/all.json`, so it works from any cwd.
+- **`--stacking` exists because the data does not define modifier composition.** A
+  weapon carries `siegeAttack change +350 (vs building)` while a technology carries
+  `siegeAttack multiply 1.2`, and nothing records the order of operations. `base`
+  multiplies base damage only; `total` multiplies base+bonus. Both are reported rather
+  than picking one silently.
+
+### The warnings are the point
+
+Every query ends with caveats, because four failure modes in the data are otherwise
+invisible and produce confidently wrong answers:
+
+| Warning | Meaning |
+| --- | --- |
+| `unmodelled` | tech has `effects: []` but its description mentions this item — indistinguishable from "does nothing" |
+| `untargeted-effect` | effect has no selector at all (the `float_properties` fallback in `parse.ts`) — **excluded** from the maths |
+| `dangling-selector` | selector names a `baseId` that exists nowhere — looks well-formed, matches nothing |
+| `unknown-property` | `placeholderAbility` output; not applied |
+
+The canonical example: Templar "Counterweight Defenses" (+1 trebuchet projectile — the
+largest single term in that unit's damage) is `unmodelled`, so a naive query scores it
+as a no-op and reports the wrong civ as strongest. Conversely, Templar "Kingdom of
+Poland" is `untargeted`, so a naive query stacks ×1.5 onto a trebuchet. Trust the
+warnings before trusting the numbers.
+
 ## Conventions
 
 - TypeScript run through `ts-node` with `transpileOnly: true` — **type errors do not
@@ -238,6 +285,15 @@ changes thousands of lines, the predicate is too broad.
 - `writeJson` is fire-and-forget (`fs.writeFile` with a callback), so the process can
   exit with writes still in flight on very large runs.
 - The README's "Development" section is partly out of date (see the Commands section).
+- **35 technology records carry effects with no selector**, emitted by the generic
+  `float_properties` fallback in `parse.ts` when a tech has no `technologyModifiers`
+  entry: it blankets melee/ranged/siege/fire attack with no target. Their descriptions
+  contradict them (Templar "Kingdom of Poland" says *cavalry* but the effect is
+  untargeted). Fixing these properly needs one modifier per tech, and the values come
+  from tooltip format arguments that are only readable with `source/` present.
+  `yarn analyse` excludes and reports them in the meantime.
+- **283 technology and 65 ability records have `effects: []`**, and 323 carry an
+  `unknown` placeholder. Some are deliberate; many are simply not modelled yet.
 
 ## Data licensing
 

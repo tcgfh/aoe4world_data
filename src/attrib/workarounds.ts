@@ -954,7 +954,7 @@ workaround("Set 10000 Bolts requirements", {
   predicate: (item) => item.type === "technology" && item.baseId === "10000-bolts",
   mutator: (item) => {
     item = item as Technology;
-    item.effects = item.effects?.map((e) => ({ ...e, select: { id: ["zhuge-nu", "crossbow"] } }));
+    item.effects = item.effects?.map((e) => ({ ...e, select: { id: ["zhuge-nu", "crossbowman"] } }));
   },
 });
 
