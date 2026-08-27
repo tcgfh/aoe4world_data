@@ -4,11 +4,12 @@
  *   yarn analyse unit counterweight-trebuchet templar
  *   yarn analyse rank counterweight-trebuchet --target building
  *   yarn analyse techs counterweight-trebuchet templar
+ *   yarn analyse mechanics mongols
  *
- * Flags: --target unit|building|naval   --stacking base|total
+ * Flags: --target unit|building|naval   --stacking base|total   --mechanics (show all)
  */
 
-import { analyse, data, rankByDps, type DamageTarget, type Stacking, type Warning } from "./derive.ts";
+import { analyse, civMechanics, data, rankByDps, type DamageTarget, type Mechanic, type Stacking, type Warning } from "./derive.ts";
 
 const argv = process.argv.slice(2);
 const flag = (name: string, fallback: string) => {
@@ -20,6 +21,7 @@ const positional = argv.filter((a, i) => !a.startsWith("--") && !argv[i - 1]?.st
 const [command, baseId, civ] = positional;
 const target = flag("target", "building") as DamageTarget;
 const stacking = flag("stacking", "base") as Stacking;
+const allMechanics = argv.includes("--mechanics");
 
 const pad = (s: any, n: number) => String(s).padEnd(n);
 const num = (s: any, n: number) => String(s).padStart(n);
@@ -29,6 +31,33 @@ function printWarnings(warnings: Warning[]) {
   if (!warnings.length) return;
   console.log(`\n  ⚠ ${warnings.length} caveat(s) — the data is incomplete or self-contradictory here:`);
   for (const w of warnings) console.log(`    [${w.kind}] ${w.subject}: ${w.detail}`);
+}
+
+const wrap = (text: string, indent: string) =>
+  text
+    .split("\n")
+    .flatMap((line) => line.match(/.{1,96}(\s|$)/g) ?? [line])
+    .map((l) => indent + l.trim())
+    .join("\n");
+
+/** Every mechanic is *named* on every query, and only the ones matching the unit are
+ *  expanded. Relevance here is a coarse text match, and it demonstrably misses things —
+ *  the Mongol Ovoo entry never mentions a siege unit, yet it is what gates the
+ *  (Improved) research that changes the numbers. Listing all titles means a missed
+ *  match costs a follow-up rather than a wrong answer. */
+function printUnitMechanics(matched: Mechanic[], all: Mechanic[], civName: string) {
+  if (!all.length) return;
+  console.log(`\n  ${civName} mechanics (civilizations/<slug>.json):`);
+  for (const m of all) {
+    const hit = matched.some((x) => x.title === m.title);
+    if (hit || allMechanics) {
+      console.log(`    • ${m.title}${hit ? "  <- mentions this unit" : ""}`);
+      if (m.text) console.log(wrap(m.text, "      "));
+    } else {
+      console.log(`    · ${m.title}`);
+    }
+  }
+  if (!allMechanics) console.log(`      (--mechanics expands all; relevance is a text match and can miss gating mechanics)`);
 }
 
 function unitCommand() {
@@ -48,7 +77,18 @@ function unitCommand() {
       console.log(`    ${pad(t, 10)}${num(v, 16)}${num(d, 16)}`);
     }
   }
+  printUnitMechanics(r.mechanics, civMechanics(civ), r.civName);
   printWarnings(r.warnings);
+}
+
+function mechanicsCommand() {
+  const m = civMechanics(baseId);
+  if (!m.length) return (console.error(`No civilization mechanics found for "${baseId}"`), process.exit(1));
+  console.log(`\n${baseId} — civilization mechanics (civilizations/<slug>.json -> overview)`);
+  for (const x of m) {
+    console.log(`  • ${x.title}`);
+    if (x.text) console.log(wrap(x.text, "    "));
+  }
 }
 
 function rankCommand() {
@@ -84,15 +124,18 @@ try {
   if (command === "unit" && baseId && civ) unitCommand();
   else if (command === "rank" && baseId) rankCommand();
   else if (command === "techs" && baseId && civ) techsCommand();
+  else if (command === "mechanics" && baseId) mechanicsCommand();
   else {
     console.log(`Usage:
   analyse unit  <baseId> <civ>    derived stats for one unit, one civ
   analyse rank  <baseId>          every civ that fields the unit, ranked by DPS
   analyse techs <baseId> <civ>    the technologies that modify it
+  analyse mechanics <civ>         that civ's in-game trait summary (its mechanics)
 
 Flags:
   --target   unit | building | naval   (default: building)
   --stacking base | total              (default: base)
+  --mechanics                          on 'unit', expand every civ mechanic, not just matches
 
 Civs: ${Object.values(data.civs)
       .map((c: any) => c.slug)

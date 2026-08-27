@@ -59,6 +59,12 @@ export interface WeaponStats {
   perTarget: Record<DamageTarget, { volley: Record<Stacking, number>; dps: Record<Stacking, number> }>;
 }
 
+/** One entry of a civ's in-game trait summary (`civilizations/{slug}.json` -> overview). */
+export interface Mechanic {
+  title: string;
+  text: string;
+}
+
 export interface AnalysisResult {
   unit: Unit;
   civ: string;
@@ -66,6 +72,8 @@ export interface AnalysisResult {
   techs: Technology[];
   weapons: WeaponStats[];
   warnings: Warning[];
+  /** Civ mechanics that mention this unit, its classes, or its producers. */
+  mechanics: Mechanic[];
 }
 
 // ––––––––––––––––––––– data loading –––––––––––––––––––––
@@ -171,6 +179,48 @@ export function sameAgeLandmarkRivals(producers: string[], civ: string): string[
   const lm = landmarks();
   const ages = new Set(data.buildings.filter((b) => producers.includes(b.baseId) && b.civs.includes(civ as any)).map((b) => b.age));
   return [...new Set(data.buildings.filter((b) => b.civs.includes(civ as any) && lm.has(b.baseId) && ages.has(b.age) && !producers.includes(b.baseId)).map((b) => b.baseId))];
+}
+
+// ––––––––––––––––––––– civ mechanics –––––––––––––––––––––
+
+const overviewCache = new Map<string, Mechanic[]>();
+
+/** A civ's in-game trait summary — the closest thing this repo has to a mechanics doc.
+ *
+ * Produced by `getCivInfo` in run.ts from the army bag's `global_traits_summary`, and
+ * the only place mechanics like Ovoo influence, building packing or the Silk Road
+ * thresholds are written down. Nothing links these to the technologies they gate, so
+ * they are surfaced as prose next to the numbers rather than folded into them. */
+export function civMechanics(civInput: string): Mechanic[] {
+  const civ = civByAny(civInput);
+  if (!civ) return [];
+  if (overviewCache.has(civ.slug)) return overviewCache.get(civ.slug)!;
+  let out: Mechanic[] = [];
+  try {
+    const raw = JSON.parse(fs.readFileSync(path.join(ROOT, "civilizations", `${civ.slug}.json`), "utf8"));
+    out = (raw.overview ?? []).map((o: any) => ({ title: o.title ?? "", text: o.description ?? (o.list ?? []).join("\n") ?? "" }));
+  } catch {
+    out = [];
+  }
+  overviewCache.set(civ.slug, out);
+  return out;
+}
+
+/** Civ mechanics whose text mentions the item, one of its classes, or a producer.
+ *
+ * A coarse text match — the data carries no link between a trait and the items it
+ * affects — but enough to put "buildings within influence ... improved technology" in
+ * front of anyone asking about a Mongol siege unit. */
+export function mechanicsFor(item: Item, civInput: string): Mechanic[] {
+  const words = [item.baseId.split("-"), item.name.toLowerCase().split(" "), item.classes, item.producedBy ?? []]
+    .flat()
+    .map((w) => String(w).toLowerCase())
+    .filter((w) => w.length > 3);
+  const needles = [...new Set(words)];
+  return civMechanics(civInput).filter((m) => {
+    const hay = `${m.title} ${m.text}`.toLowerCase();
+    return needles.some((n) => hay.includes(n));
+  });
 }
 
 /** Technologies for `civ` that mention the item by name but declare no effects at all.
@@ -302,7 +352,7 @@ export function analyse(baseId: string, civInput: string): AnalysisResult {
     return stats;
   });
 
-  return { unit, civ: civ.abbr, civName: civ.name, techs, weapons, warnings };
+  return { unit, civ: civ.abbr, civName: civ.name, techs, weapons, warnings, mechanics: mechanicsFor(unit, civ.abbr) };
 }
 
 /** Rank every civ that fields `baseId`, by the best DPS among that unit's weapons. */

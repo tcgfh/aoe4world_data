@@ -125,6 +125,15 @@ For `T` in `units | buildings | technologies | upgrades | abilities`:
 `civilizations/{slug}.json` holds the civ overview + tech tree;
 `civilizations/civs-index.json` mirrors the `CIVILIZATIONS` config.
 
+**`civilizations/{slug}.json` -> `overview` is the mechanics reference.** It is the
+in-game civ trait summary (built by `getCivInfo` from the army bag's
+`global_traits_summary`) and the only place game mechanics are written down: Ovoo
+influence, one-landmark-per-age, building packing, Silk Road thresholds, per-age Ovoo
+stone rates. **Read it before reasoning about why a civ's numbers differ** — it is far
+cheaper than reverse-engineering a mechanic from `producedBy`, which is how the Ovoo
+rule was (re)discovered the hard way. `yarn analyse mechanics <civ>` prints it, and
+`yarn analyse unit` names every entry alongside the numbers.
+
 The "optimized" format hoists the most common value of each key onto the group and
 leaves only differences on each variation; `optimizedToUnified()` reverses it. Do not
 hand-edit optimized files.
@@ -228,10 +237,11 @@ technologies that modify it, and **not** the semantics for how modifiers compose
 parser or the published schema.
 
 ```bash
-yarn analyse unit  counterweight-trebuchet templar     # derived stats, one unit + civ
-yarn analyse rank  counterweight-trebuchet             # every civ, ranked by DPS
-yarn analyse techs counterweight-trebuchet templar     # what modifies it
-# flags: --target unit|building|naval   --stacking base|total
+yarn analyse unit      counterweight-trebuchet templar # derived stats, one unit + civ
+yarn analyse rank      counterweight-trebuchet         # every civ, ranked by DPS
+yarn analyse techs     counterweight-trebuchet templar # what modifies it
+yarn analyse mechanics mongols                         # that civ's trait summary
+# flags: --target unit|building|naval   --stacking base|total   --mechanics
 ```
 
 - `derive.ts` holds the logic (selector matching, the reverse index, stat derivation);
@@ -243,6 +253,17 @@ yarn analyse techs counterweight-trebuchet templar     # what modifies it
   `siegeAttack multiply 1.2`, and nothing records the order of operations. `base`
   multiplies base damage only; `total` multiplies base+bonus. Both are reported rather
   than picking one silently.
+
+### Mechanics context
+
+`analyse unit` prints the civ's mechanics beside the numbers. Entries whose text
+mentions the unit are expanded; the rest are listed by title only, and `--mechanics`
+expands everything. Relevance is a **coarse text match and it does miss things** — the
+Mongol "Influence" entry never names a siege unit, yet Ovoo influence is what gates the
+`(Improved)` research that changes those numbers. Every entry is therefore always
+*named*, so a missed match costs a follow-up rather than a wrong answer. Nothing in the
+data links a mechanic to the items it governs; that link is the main thing a future
+mechanics registry would add.
 
 ### The warnings are the point
 
