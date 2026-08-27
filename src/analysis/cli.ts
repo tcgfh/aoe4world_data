@@ -9,7 +9,7 @@
  * Flags: --target unit|building|naval   --stacking base|total   --mechanics (show all)
  */
 
-import { analyse, civMechanics, data, rankByDps, type DamageTarget, type Mechanic, type Stacking, type Warning } from "./derive.ts";
+import { analyse, civMechanics, data, effectiveDps, rankByDps, type DamageTarget, type Mechanic, type Stacking, type Warning } from "./derive.ts";
 
 const argv = process.argv.slice(2);
 const flag = (name: string, fallback: string) => {
@@ -22,6 +22,8 @@ const [command, baseId, civ] = positional;
 const target = flag("target", "building") as DamageTarget;
 const stacking = flag("stacking", "base") as Stacking;
 const allMechanics = argv.includes("--mechanics");
+const volleys = Number(flag("volleys", "Infinity"));
+const travel = Number(flag("travel", "0"));
 
 const pad = (s: any, n: number) => String(s).padEnd(n);
 const num = (s: any, n: number) => String(s).padStart(n);
@@ -77,6 +79,17 @@ function unitCommand() {
       console.log(`    ${pad(t, 10)}${num(v, 16)}${num(d, 16)}`);
     }
   }
+  for (const w of r.weapons) {
+    if (!w.setup && !w.teardown) continue;
+    console.log(`\n  ${w.name}: effective DPS vs ${target} over a siege cycle (travel -> unpack ${w.setup}s -> N volleys -> pack ${w.teardown}s)`);
+    console.log(`    ${pad("travel", 10)}${["N=1", "N=2", "N=3", "N=5", "N=10", "N=\u221e"].map((x) => num(x, 8)).join("")}`);
+    for (const t of [0, 10, 25]) {
+      const cells = [1, 2, 3, 5, 10, Infinity].map((n) => num(round(effectiveDps(w, r.unit.movement?.speed ?? 0, { volleys: n, travelTiles: t, target, stacking })), 8)).join("");
+      console.log(`    ${pad(t + " tiles", 10)}${cells}`);
+    }
+    console.log(`      (N = volleys per setup; both N and travel are player behaviour, not data — read the spread, not one cell)`);
+  }
+
   printUnitMechanics(r.mechanics, civMechanics(civ), r.civName);
   printWarnings(r.warnings);
 }
@@ -93,13 +106,20 @@ function mechanicsCommand() {
 
 function rankCommand() {
   const rows = rankByDps(baseId, target, stacking);
-  console.log(`\n${baseId} — DPS vs ${target} (stacking: ${stacking})\n`);
+  const cyclic = Number.isFinite(volleys) || travel > 0;
+  if (cyclic)
+    rows.sort(
+      (a, b) =>
+        effectiveDps(b.weapon, b.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }) -
+        effectiveDps(a.weapon, a.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }),
+    );
+  console.log(`\n${baseId} — ${cyclic ? `effective DPS over a siege cycle (${volleys} volleys, ${travel} tiles travel)` : "DPS"} vs ${target} (stacking: ${stacking})\n`);
   console.log(`  ${pad("CIV", 22)}${pad("UNIT", 24)}${num("PROJ", 5)}${num("DMG", 6)}${num("MULT", 7)}${num("CYCLE", 8)}${num("VOLLEY", 9)}${num("DPS", 8)}`);
   for (const r of rows) {
     const w = r.weapon;
     console.log(
       `  ${pad(r.civ, 22)}${pad(r.unit, 24)}${num(w.projectiles, 5)}${num(w.baseDamage, 6)}${num("x" + round(w.multiplier), 7)}${num(w.interval, 8)}` +
-        `${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(w.perTarget[target].dps[stacking]), 8)}`,
+        `${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(cyclic ? effectiveDps(w, r.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }) : w.perTarget[target].dps[stacking]), 8)}`,
     );
   }
   const all = rows.flatMap((r) => r.result.warnings.map((w) => `${r.civ}: [${w.kind}] ${w.subject}`));
@@ -136,6 +156,8 @@ Flags:
   --target   unit | building | naval   (default: building)
   --stacking base | total              (default: base)
   --mechanics                          on 'unit', expand every civ mechanic, not just matches
+  --volleys  <n>                       volleys per setup; switches DPS to a siege-cycle figure
+  --travel   <tiles>                   reposition distance folded into that cycle
 
 Civs: ${Object.values(data.civs)
       .map((c: any) => c.slug)

@@ -54,6 +54,10 @@ export interface WeaponStats {
   baseDamage: number;
   /** Full attack cycle in seconds (aim + windup + attack + winddown + reload). */
   interval: number;
+  /** Pack/unpack time, in seconds. Sits OUTSIDE the attack cycle: it is paid once per
+   *  reposition, not per volley, so steady-state DPS cannot show it. */
+  setup: number;
+  teardown: number;
   multiplier: number;
   flatBonus: number;
   perTarget: Record<DamageTarget, { volley: Record<Stacking, number>; dps: Record<Stacking, number> }>;
@@ -281,7 +285,19 @@ export function analyseWeapon(weapon: Weapon, modifiers: Modifier[]): WeaponStat
     perTarget[target] = { volley, dps: { base: volley.base / interval, total: volley.total / interval } };
   }
 
-  return { name: weapon.name ?? weapon.type, type: weapon.type, projectiles, baseDamage: weapon.damage, interval, multiplier, flatBonus, perTarget };
+  const d = weapon.durations ?? {};
+  return {
+    name: weapon.name ?? weapon.type,
+    type: weapon.type,
+    projectiles,
+    baseDamage: weapon.damage,
+    interval,
+    setup: d.setup ?? 0,
+    teardown: d.teardown ?? 0,
+    multiplier,
+    flatBonus,
+    perTarget,
+  };
 }
 
 export function analyse(baseId: string, civInput: string): AnalysisResult {
@@ -353,6 +369,24 @@ export function analyse(baseId: string, civInput: string): AnalysisResult {
   });
 
   return { unit, civ: civ.abbr, civName: civ.name, techs, weapons, warnings, mechanics: mechanicsFor(unit, civ.abbr) };
+}
+
+/** Damage per second over one full siege cycle: travel -> unpack -> `volleys` volleys
+ *  -> pack. Converges to steady-state DPS as `volleys` grows, so it is a strict
+ *  generalisation of `perTarget[t].dps` rather than a competing number.
+ *
+ *  `volleys` and `travelTiles` are **player behaviour, not data** — nothing in the
+ *  dataset says how often a siege engine repositions. The metric therefore exists to
+ *  show sensitivity across plausible play, never to produce one authoritative figure.
+ *  Its value is pricing effects that steady-state DPS structurally cannot show: Rus
+ *  Siege Crew Training (instant pack/unpack) is worth ~+4% in a static siege and
+ *  ~+18% in hit-and-run, on identical damage. */
+export function effectiveDps(w: WeaponStats, moveSpeed: number, opts: { volleys: number; travelTiles?: number; target?: DamageTarget; stacking?: Stacking }): number {
+  const { volleys, travelTiles = 0, target = "building", stacking = "base" } = opts;
+  if (!Number.isFinite(volleys)) return w.perTarget[target].dps[stacking];
+  const travel = moveSpeed > 0 ? travelTiles / moveSpeed : 0;
+  const elapsed = travel + w.setup + volleys * w.interval + w.teardown;
+  return elapsed > 0 ? (volleys * w.perTarget[target].volley[stacking]) / elapsed : 0;
 }
 
 /** Rank every civ that fields `baseId`, by the best DPS among that unit's weapons. */

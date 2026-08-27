@@ -242,6 +242,7 @@ yarn analyse rank      counterweight-trebuchet         # every civ, ranked by DP
 yarn analyse techs     counterweight-trebuchet templar # what modifies it
 yarn analyse mechanics mongols                         # that civ's trait summary
 # flags: --target unit|building|naval   --stacking base|total   --mechanics
+#        --volleys <n>  --travel <tiles>   (effective DPS over a siege cycle)
 ```
 
 - `derive.ts` holds the logic (selector matching, the reverse index, stat derivation);
@@ -253,6 +254,24 @@ yarn analyse mechanics mongols                         # that civ's trait summar
   `siegeAttack multiply 1.2`, and nothing records the order of operations. `base`
   multiplies base damage only; `total` multiplies base+bonus. Both are reported rather
   than picking one silently.
+
+### Setup/teardown and effective DPS
+
+Pack/unpack time sits **outside** the attack cycle — it is paid per reposition, not per
+volley — so steady-state DPS structurally cannot show it. `--volleys <n> --travel
+<tiles>` switches the DPS figure to one full siege cycle (travel -> unpack -> n volleys
+-> pack); `analyse unit` prints a sensitivity table for any unit with setup time.
+
+Both parameters are **player behaviour, not data** — nothing records how often a siege
+engine repositions — so read the spread, never one cell. At `n = Infinity` it converges
+exactly to steady-state DPS, making it a strict generalisation rather than a competing
+number.
+
+What it is *for* is pricing effects steady-state DPS hides. Rus Siege Crew Training
+(instant pack/unpack, identical damage) is worth **+4%** in a static siege and **+18%**
+in hit-and-run. Conversely it does **not** re-rank trebuchets: the Traction Trebuchet's
+faster setup and +40% move speed narrow its deficit against the Counterweight from 27%
+to about 14%, but never close it.
 
 ### Mechanics context
 
