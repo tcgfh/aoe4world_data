@@ -66,7 +66,7 @@ const civilizations = {
   gol,
   mac,
   jin,
-  list
+  list,
 } as Record<CivAbbr, CivInfo> & { list: CivInfo[] };
 
 export const DataRegistry = {

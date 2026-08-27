@@ -14,7 +14,7 @@ workaround("Fix Golden Tent Age", {
   mutator: (item) => {
     item.age = 1;
     item.id = `${item.baseId}-${item.age}`;
-  }
+  },
 });
 
 workaround("Fix Jiangnan Tower Age", {
@@ -22,7 +22,7 @@ workaround("Fix Jiangnan Tower Age", {
   mutator: (item) => {
     item.age = 1;
     item.id = `${item.baseId}-${item.age}`;
-  }
+  },
 });
 
 workaround("Fix Mount Lu Academy Age", {
@@ -30,7 +30,7 @@ workaround("Fix Mount Lu Academy Age", {
   mutator: (item) => {
     item.age = 2;
     item.id = `${item.baseId}-${item.age}`;
-  }
+  },
 });
 
 // –––––– Building Emplacements and Garrisons ––––––
@@ -66,14 +66,14 @@ workaround("Remove all emplacement except default arrow from the Kremlin", {
 workaround("Remove all garrison and emplacement weapons from capital town center, keeps and regular keep-like landmarks, leave the passive arrow emplacement as a 3x burst", {
   predicate: (item) =>
     ["capital-town-center", "keep", "the-white-tower", "palace-of-swabia", "elzbach-palace", "saharan-trade-network", "fort-of-the-huntress", "sea-gate-castle"].includes(
-      item.baseId
+      item.baseId,
     ),
   mutator: (item) => {
     item = item as Building;
     const bow = item.weapons.find((x) => x.name === "Bow");
     if (bow) {
       bow.burst = { count: 3 };
-      if (item.baseId === "capital-town-center" && item.civs.every((c) => c == "en"  || c == "hl")) bow.burst.count = 6;
+      if (item.baseId === "capital-town-center" && item.civs.every((c) => c == "en" || c == "hl")) bow.burst.count = 6;
       item.weapons = [bow];
     } else item.weapons = [];
   },
@@ -1161,11 +1161,14 @@ workaround("Set Mercenary requirements", {
 });
 
 workaround("Split up Macedonian Techs since it's two techs per age", {
-  predicate: (item) => item.civs[0] == "mac" && item.type === "technology" && ["fortifications", "blade-inlaying", "scale-barding", "pattern-welding", "butted-chainmail", "sharpening-stones", "lamellar-armor", "iron-fittings"].includes(item.baseId),
+  predicate: (item) =>
+    item.civs[0] == "mac" &&
+    item.type === "technology" &&
+    ["fortifications", "blade-inlaying", "scale-barding", "pattern-welding", "butted-chainmail", "sharpening-stones", "lamellar-armor", "iron-fittings"].includes(item.baseId),
   mutator: (item) => {
     const level = parseInt(item.attribName?.match(/\d+/)?.at(0) || "1");
-    const code = (level % 2) ? "a" : "b";
-    
+    const code = level % 2 ? "a" : "b";
+
     item.description = item.description + "\n\nCan be researched twice in Feudal, Castle and Imperial Age, for a total of 6 times.";
     item.name = item.name += ` (${level}/6)`;
     item.id = item.id.replace(/-(\d+)$/, `-tier${level}-\$1`);
@@ -1340,11 +1343,14 @@ workaround("Deduplicating unit weapons with the same name, keeping the first", {
   predicate: (item) => item.type === "unit" && item.weapons.length > 1,
   mutator: (item) => {
     item = item as Unit;
-    item.weapons = item.weapons.reduce((wps, w) => {
-      wps = wps.filter(Boolean);
-      if (!wps.some((wp) => w.name == wp.name)) wps.push(w);
-      return wps;
-    }, [] as Unit["weapons"]);
+    item.weapons = item.weapons.reduce(
+      (wps, w) => {
+        wps = wps.filter(Boolean);
+        if (!wps.some((wp) => w.name == wp.name)) wps.push(w);
+        return wps;
+      },
+      [] as Unit["weapons"],
+    );
   },
 });
 
@@ -1541,7 +1547,7 @@ workaround("Give capital town centers unique id and clear name", {
     item.baseId = "capital-town-center";
     item.id = "capital-town-center-1";
     item.icon_src = undefined;
-    item.icon = 'buildings/capital-town-center.png';
+    item.icon = "buildings/capital-town-center.png";
   },
 });
 
@@ -1690,8 +1696,8 @@ function overrideCivUniqueIcon(ids_or_pred: string[] | Function) {
           const civConfig = CIVILIZATIONS[item.civs[0]];
           item.icon = item.icon.replace(/^(\w+\/)/, "$1" + civConfig.slug + "\/");
         }
-      }
-    }
+      },
+    };
   }
 }
 

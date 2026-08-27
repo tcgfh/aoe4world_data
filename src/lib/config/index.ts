@@ -44,7 +44,10 @@ export const FOLDERS = {
   },
 };
 
-export const ITEM_TYPE_MAP = Object.keys(FOLDERS).reduce((memo,key) => { memo[FOLDERS[key].TYPE] = key; return memo; }, {});
+export const ITEM_TYPE_MAP = Object.keys(FOLDERS).reduce((memo, key) => {
+  memo[FOLDERS[key].TYPE] = key;
+  return memo;
+}, {});
 
 export enum ITEM_TYPES {
   UNITS = "UNITS",

@@ -211,20 +211,13 @@ export const hardcodedDiscovery = {
     "abilities/modal_abilities/chinese/official_supervise_building_target_chi",
     "upgrade/races/chinese_ha_01/research/upgrade_dynasty_econ_bonus_chi_ha_01",
   ],
-  lancaster: [
-  ],
-  templar: [
-  ],
-  sengoku: [
-  ],
-  tughlaq: [
-  ],
-  goldenhorde: [
-  ],
-  macedonian: [
-  ],
-  jindynasty: [
-  ],
+  lancaster: [],
+  templar: [],
+  sengoku: [],
+  tughlaq: [],
+  goldenhorde: [],
+  macedonian: [],
+  jindynasty: [],
 };
 
 export const hardcodedDiscoveryCommon = [
@@ -396,7 +389,7 @@ export const ignoreForNow: (string | ((file: string) => boolean))[] = [
   "pagoda_forest_spawn_jin",
 
   // Inspect later if it's addable
-  "building_carts_mon_ha_gol", 
+  "building_carts_mon_ha_gol",
   "outpost_edict_display_only_mon_ha_gol",
   "stockyard_gold_edict_mon_ha_gol",
   "unit_horsearcher_rally_mon_ha_gol",
@@ -419,7 +412,6 @@ export const ignoreForNow: (string | ((file: string) => boolean))[] = [
   "manor_resource_generation_lan",
   "champion_spawner_byz_ha_mac",
   "buff_spec_monastery_ovoo_bonus_mon",
-
 
   (file) => file.includes("unit_") && file.includes("_free_abb_ha_01"),
 ];

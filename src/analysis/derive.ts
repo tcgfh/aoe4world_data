@@ -273,7 +273,15 @@ export function analyseWeapon(weapon: Weapon, modifiers: Modifier[]): WeaponStat
   const multiplier = relevant.filter((m) => m.effect === "multiply").reduce((p, m) => p * m.value, 1);
   const flatBonus = relevant.filter((m) => m.effect === "change").reduce((s, m) => s + m.value, 0);
 
-  const projectiles = weapon.burst?.count ?? 1;
+  // Technologies can add projectiles to a volley: Chinese "Additional Barrels" (+3
+  // Nest of Bees rockets) and Templar "Counterweight Defenses" (+1 trebuchet
+  // projectile). Ignoring these understated the Templar trebuchet by 50%.
+  const burstMods = modifiers.filter((m) => m.property === "burst");
+  const projectiles = Math.max(
+    1,
+    burstMods.filter((m) => m.effect === "multiply").reduce((p, m) => p * m.value, weapon.burst?.count ?? 1) +
+      burstMods.filter((m) => m.effect === "change").reduce((s, m) => s + m.value, 0),
+  );
   const interval = attackInterval(weapon);
 
   const perTarget = {} as WeaponStats["perTarget"];

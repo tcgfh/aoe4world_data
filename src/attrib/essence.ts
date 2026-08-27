@@ -15,17 +15,15 @@ const parseAsValue = ["parent_pbg", "upgrade_bag", "weapon_bag"];
 const pbgmaps = {};
 
 function initEssencePBGMap(pbgmap, folder) {
-  if (!pbgmaps[pbgmap])
-    pbgmaps[pbgmap] = {};
+  if (!pbgmaps[pbgmap]) pbgmaps[pbgmap] = {};
   const files = fs.readdirSync(folder);
   for (const f of files) {
     const filePath = path.join(folder, f);
     const stat = fs.statSync(filePath);
-    if (stat?.isDirectory())
-      initEssencePBGMap(pbgmap, filePath);
-    if (stat?.isFile() && filePath.endsWith('.json')) {
-      const pbgname = f.replace('.json', '');
-      const fullname = path.relative(ESSENCE_FOLDER, filePath).replace(/\\/g, '/').replace('.json', '')
+    if (stat?.isDirectory()) initEssencePBGMap(pbgmap, filePath);
+    if (stat?.isFile() && filePath.endsWith(".json")) {
+      const pbgname = f.replace(".json", "");
+      const fullname = path.relative(ESSENCE_FOLDER, filePath).replace(/\\/g, "/").replace(".json", "");
       pbgmaps[pbgmap][pbgname] = fullname;
     }
   }
@@ -37,15 +35,18 @@ export async function getEssenceData<T = NormalizedAttrib>(file: string, context
     throw new Error(`EssenceData not found ${file}`);
   }
 
-  let filePath = path.join(ESSENCE_FOLDER, fullname + '.json');
+  let filePath = path.join(ESSENCE_FOLDER, fullname + ".json");
 
-  const fileData: EssenceData = await fs.promises.readFile(filePath, "utf-8").then(JSON.parse).catch(e => {
-    console.log(filePath, e);
-    throw e;
-  });
+  const fileData: EssenceData = await fs.promises
+    .readFile(filePath, "utf-8")
+    .then(JSON.parse)
+    .catch((e) => {
+      console.log(filePath, e);
+      throw e;
+    });
 
   let result: any = { extensions: [] };
-  let dataDefault = fileData.data.filter(d => d.key == 'default')[0]?.value;
+  let dataDefault = fileData.data.filter((d) => d.key == "default")[0]?.value;
   if (!dataDefault) {
     throw new Error(`No default data ${file}`);
   }
@@ -79,7 +80,7 @@ function parseItemAsExt({ key, value }: EssenceItem) {
 
 export async function guessAppropriateEssenceFile(file: string) {
   // name can be 'pbgmap/pbgname' or already a fullname 'pbgmap/*/pbgname'
-  const split = file.split('/');
+  const split = file.split("/");
   const pbgmap = split[0];
   const pbgname = split.at(-1) as string;
 

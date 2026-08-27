@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { constants } from "fs";
 import pixelmatch from "pixelmatch";
-import {PNG} from 'pngjs';
+import { PNG } from "pngjs";
 import { CivConfig } from "../types/civs";
 
 const MAX_ICON_PIXEL_DIFF = 5;
@@ -12,22 +12,20 @@ const MAX_ICON_PIXEL_DIFF = 5;
 async function imageDifferent(img1Path: string, img2Path: string): Promise<boolean> {
   const img1 = PNG.sync.read(await fs.readFile(img1Path));
   const img2 = PNG.sync.read(await fs.readFile(img2Path));
-  const {width, height} = img1;
-  
+  const { width, height } = img1;
+
   if (img1.width !== img2.width || img1.height !== img2.height) {
     return true;
   }
 
   const pixels = pixelmatch(img1.data, img2.data, undefined, width, height);
 
-  if (pixels > MAX_ICON_PIXEL_DIFF)
-    console.log(`Diffing ${img1Path} and ${img2Path}: ${pixels} pixels`);
+  if (pixels > MAX_ICON_PIXEL_DIFF) console.log(`Diffing ${img1Path} and ${img2Path}: ${pixels} pixels`);
 
   return pixels > MAX_ICON_PIXEL_DIFF;
 }
 
 export async function prepareIcon(icon: string, type: ITEM_TYPES, baseId: string, id: string, civ: CivConfig) {
-
   if (!icon) {
     return [];
   }
@@ -53,13 +51,26 @@ export async function copyIcon(sourcePath, relativeIconPath, overwrite = false) 
   }
 
   const iconPath = path.join(IMG_PATH, relativeIconPath);
-  const sourceExists = sourcePath && await fs.access(sourcePath).then(() => true).catch(() => false);
-  const destExists = await fs.access(iconPath).then(() => true).catch(() => false);
+  const sourceExists =
+    sourcePath &&
+    (await fs
+      .access(sourcePath)
+      .then(() => true)
+      .catch(() => false));
+  const destExists = await fs
+    .access(iconPath)
+    .then(() => true)
+    .catch(() => false);
 
-  if (overwrite || !destExists || (!overwrite && sourceExists && destExists && await imageDifferent(sourcePath, iconPath))) {
+  if (overwrite || !destExists || (!overwrite && sourceExists && destExists && (await imageDifferent(sourcePath, iconPath)))) {
     console.log(`[Info] Copying icon '${sourcePath}' to '${iconPath}'`);
     const dirName = path.dirname(iconPath);
-    if (!await fs.access(dirName).then(() => true).catch(() => false)) {
+    if (
+      !(await fs
+        .access(dirName)
+        .then(() => true)
+        .catch(() => false))
+    ) {
       await fs.mkdir(dirName);
     }
     await fs.copyFile(sourcePath, iconPath);
@@ -84,7 +95,7 @@ export async function useIcon(icon: string, type: ITEM_TYPES, id: string, overwr
   const iconFolder = FOLDERS[type].IMG;
   const iconFile = `${id}.png`;
   const iconPath = path.join(iconFolder, iconFile);
-  const relativeIconPath = path.join(IMAGE_FOLDER, FOLDERS[type].SLUG, iconFile).replace(/\\/g, '/');
+  const relativeIconPath = path.join(IMAGE_FOLDER, FOLDERS[type].SLUG, iconFile).replace(/\\/g, "/");
   const sourcePath = path.join(ICON_FOLDER, `${icon}.png`);
 
   if (overwrite || !(await fs.stat(iconPath).catch(() => null))) {

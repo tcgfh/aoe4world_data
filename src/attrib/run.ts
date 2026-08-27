@@ -42,11 +42,7 @@ interface CivTechTree {
   civOverview: any;
 }
 
-
-async function buildTechTree(
-  civ: CivConfig,
-  context: RunContext = { debug: false, getData, race: civ.attribName! }
-) : Promise<CivTechTree> {
+async function buildTechTree(civ: CivConfig, context: RunContext = { debug: false, getData, race: civ.attribName! }): Promise<CivTechTree> {
   const techtree = {};
   const files = new Set<string>();
   const items = new Map<string, Item>();
@@ -103,7 +99,7 @@ async function buildTechTree(
       console.error(
         `Duplicate item id ${item.id} in ${file} conflicts with ${items.get(item.id)!.attribName} ${[...files.values()]
           .filter((x) => x?.includes(items.get(item.id)!.attribName!))
-          .join(", ")}`
+          .join(", ")}`,
       );
     }
 
@@ -137,7 +133,6 @@ async function buildTechTree(
     return item;
   }
 
-
   for (const f of files) await parseFileRecursively(f);
 
   function fetchTree(id, depth = 0) {
@@ -153,8 +148,8 @@ async function buildTechTree(
   return {
     civ,
     civOverview,
-    items: [...items.values()]
-  }
+    items: [...items.values()],
+  };
 }
 
 function ensureFolderStructure() {
@@ -175,13 +170,12 @@ function sortProducedBy(item: any) {
   return item;
 }
 
-function groupBy<T>(list: T[], func:(x:T)=>string | undefined): Map<string, T[]> {
+function groupBy<T>(list: T[], func: (x: T) => string | undefined): Map<string, T[]> {
   const result = new Map<string, T[]>();
 
-  list.forEach(item => {
+  list.forEach((item) => {
     const key = func(item);
-    if (key === undefined)
-      return;
+    if (key === undefined) return;
     const collection = result.get(key);
     if (collection) {
       collection.push(item);
@@ -226,7 +220,7 @@ async function tryFindFile(race: string, paths: string[]) {
       paths.map((path) => {
         if (!path) return undefined;
         return guessAppropriateEssenceFile(path) ?? path;
-      })
+      }),
     )
   ).filter(Boolean) as string[];
 }
@@ -275,7 +269,10 @@ async function compile(type: ITEM_TYPES) {
   const items = await getAllItems(type);
   if (!items) return;
   const unified = unifyItems(items);
-  const baseIds = items.reduce((s, item) => { s[`${FOLDERS[type].SLUG}/${item.baseId}`] = item.name; return s; }, {});
+  const baseIds = items.reduce((s, item) => {
+    s[`${FOLDERS[type].SLUG}/${item.baseId}`] = item.name;
+    return s;
+  }, {});
 
   writeJson(path.join(FOLDERS[type].DATA, "all.json"), { ...meta, data: items });
   writeJson(path.join(FOLDERS[type].DATA, "all-unified.json"), { ...meta, data: unified });
@@ -302,51 +299,48 @@ async function compile(type: ITEM_TYPES) {
   }
 
   // Detect icon conflicts (and potentially resolve)
-  let iconMap = groupBy([...civTechTreeMap.values()].map(v => v.items).flat(), item => item.icon);
+  let iconMap = groupBy([...civTechTreeMap.values()].map((v) => v.items).flat(), (item) => item.icon);
   for (const [icon_dest, variations] of iconMap) {
-    const icon_srcs = [...new Set(variations.map((v) => v.icon_src).filter(v => v))];
+    const icon_srcs = [...new Set(variations.map((v) => v.icon_src).filter((v) => v))];
     if (icon_srcs.length > 1) {
       resolveIconConflict(icon_dest, variations);
     }
   }
-  iconMap = groupBy([...civTechTreeMap.values()].map(v => v.items).flat(), item => item.icon);
+  iconMap = groupBy([...civTechTreeMap.values()].map((v) => v.items).flat(), (item) => item.icon);
 
   // Copy Icons
   for (const [icon_dest, variations] of iconMap) {
-    const icon_src = variations.map(v => v.icon_src).filter(v => v)[0];
+    const icon_src = variations.map((v) => v.icon_src).filter((v) => v)[0];
     const newIcon = await copyIcon(icon_src, icon_dest);
-    variations.forEach(v => {
+    variations.forEach((v) => {
       if (v.icon) {
         v.icon = newIcon;
       }
-      delete v['icon_src'];
+      delete v["icon_src"];
     });
   }
 
   // Persist Items & Civ
   for (const [civ, techTree] of civTechTreeMap) {
     console.log(`Persisting ${techTree.civ.name}...`);
-    techTree.items.forEach(item => {
+    techTree.items.forEach((item) => {
       persistItem(item, techTree.civ);
     });
-    
+
     writeJson(`${FOLDERS.CIVILIZATIONS.DATA}/${techTree.civ.slug}.json`, techTree.civOverview, { log: false });
   }
 
-writeJson(`${FOLDERS.CIVILIZATIONS.DATA}/civs-index.json`, CIVILIZATIONS, { log: false });
+  writeJson(`${FOLDERS.CIVILIZATIONS.DATA}/civs-index.json`, CIVILIZATIONS, { log: false });
 
   [ITEM_TYPES.UNITS, ITEM_TYPES.TECHNOLOGIES, ITEM_TYPES.BUILDINGS, ITEM_TYPES.UPGRADES, ITEM_TYPES.ABILITIES].forEach((type) => compile(type));
 })();
 
 function resolveIconConflict(icon_dest: string, variations: Item[]) {
   let groups = {};
-  variations.forEach(v => {
-    if (!v.icon_src)
-      return;
-    else if (groups[v.icon_src])
-      groups[v.icon_src].push(v);
-    else
-      groups[v.icon_src] = [v];
+  variations.forEach((v) => {
+    if (!v.icon_src) return;
+    else if (groups[v.icon_src]) groups[v.icon_src].push(v);
+    else groups[v.icon_src] = [v];
   });
   console.log(`Icon conflict at ${icon_dest} by: ${JSON.stringify(Object.keys(groups))}`);
   /*for (const variation of variations) {

@@ -11,7 +11,7 @@ export function parseWeapons(combat_ext: any, context: RunContext): Promise<Weap
     (h.hardpoint?.weapon_table ?? h.weapon_table)?.map((w) => ({
       weapon: (w.weapon ?? w).non_entity_weapon_wrapper?.non_entity_weapon_wrapper_pbg,
       attach: (w.weapon?.weapon_entity_attachment ?? w.weapon ?? w)?.entity_attach_data?.ebp,
-    }))
+    })),
   ) ?? []) as { weapon?: string; attach?: string }[];
 
   const weapons = weaponList.map(async (ref) => {
@@ -92,7 +92,7 @@ async function oneWeaponPerType(weapons: Promise<Weapon | undefined>[]): Promise
     wps
       .filter(Boolean)
       .reverse()
-      .map((w) => w!.type)
+      .map((w) => w!.type),
   );
   return wps.filter(Boolean) as Weapon[];
 }

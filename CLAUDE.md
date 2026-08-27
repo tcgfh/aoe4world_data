@@ -350,6 +350,9 @@ at an ordinary siege-workshop inside Ovoo influence, at double cost.
   untargeted). Fixing these properly needs one modifier per tech, and the values come
   from tooltip format arguments that are only readable with `source/` present.
   `yarn analyse` excludes and reports them in the meantime.
+- Technologies can add projectiles via a `burst` modifier (Chinese "Additional
+  Barrels", Templar "Counterweight Defenses"). `analyse` applies these; forgetting
+  them understated the Nest of Bees by 30% and the Templar trebuchet by 50%.
 - **283 technology and 65 ability records have `effects: []`**, and 323 carry an
   `unknown` placeholder. Some are deliberate; many are simply not modelled yet.
 
