@@ -107,21 +107,50 @@ function mechanicsCommand() {
 function rankCommand() {
   const rows = rankByDps(baseId, target, stacking);
   const cyclic = Number.isFinite(volleys) || travel > 0;
-  if (cyclic)
-    rows.sort(
-      (a, b) =>
-        effectiveDps(b.weapon, b.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }) -
-        effectiveDps(a.weapon, a.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }),
-    );
-  console.log(`\n${baseId} — ${cyclic ? `effective DPS over a siege cycle (${volleys} volleys, ${travel} tiles travel)` : "DPS"} vs ${target} (stacking: ${stacking})\n`);
-  console.log(`  ${pad("CIV", 22)}${pad("UNIT", 24)}${num("PROJ", 5)}${num("DMG", 6)}${num("MULT", 7)}${num("CYCLE", 8)}${num("VOLLEY", 9)}${num("DPS", 8)}`);
+  const dpsOf = (r: (typeof rows)[number]) =>
+    cyclic ? effectiveDps(r.weapon, r.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }) : r.weapon.perTarget[target].dps[stacking];
+  // Tie-break on age: identical DPS available in Castle beats the same unit in
+  // Imperial, so the earlier civ should not sort below the later one arbitrarily.
+  rows.sort((a, b) => dpsOf(b) - dpsOf(a) || a.result.unit.age - b.result.unit.age || a.civ.localeCompare(b.civ));
+
+  // Civs whose stats are identical are collapsed into one row. Printing them as
+  // separate ranked lines implies a winner the numbers do not support — the Royal
+  // Cannon is identical for French, Jeanne d'Arc and Byzantines, and only `age` and
+  // `producedBy` distinguish them.
+  type Group = { civs: string[]; row: (typeof rows)[number]; dps: number; producers: Set<string> };
+  const groups: Group[] = [];
   for (const r of rows) {
     const w = r.weapon;
-    console.log(
-      `  ${pad(r.civ, 22)}${pad(r.unit, 24)}${num(w.projectiles, 5)}${num(w.baseDamage, 6)}${num("x" + round(w.multiplier), 7)}${num(w.interval, 8)}` +
-        `${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(cyclic ? effectiveDps(w, r.result.unit.movement?.speed ?? 0, { volleys, travelTiles: travel, target, stacking }) : w.perTarget[target].dps[stacking]), 8)}`,
-    );
+    const sig = [r.unit, r.result.unit.age, w.projectiles, w.baseDamage, w.multiplier, w.interval, round(w.perTarget[target].volley[stacking]), round(dpsOf(r))].join("|");
+    const found = groups.find((g) => g.sig === sig) as any;
+    if (found) {
+      found.civs.push(r.civ);
+      (r.result.unit.producedBy ?? []).forEach((p: string) => found.producers.add(p));
+    } else {
+      groups.push({ sig, civs: [r.civ], row: r, dps: dpsOf(r), producers: new Set(r.result.unit.producedBy ?? []) } as any);
+    }
   }
+
+  console.log(`\n${baseId} — ${cyclic ? `effective DPS over a siege cycle (${volleys} volleys, ${travel} tiles travel)` : "DPS"} vs ${target} (stacking: ${stacking})\n`);
+  console.log(`  ${pad("CIV(S)", 40)}${pad("UNIT", 24)}${num("AGE", 4)}${num("PROJ", 5)}${num("DMG", 6)}${num("MULT", 7)}${num("CYCLE", 8)}${num("VOLLEY", 9)}${num("DPS", 8)}`);
+  const multiProducer = new Set(groups.flatMap((g) => [...g.producers])).size > 1;
+  for (const g of groups) {
+    const w = g.row.weapon;
+    const civs = g.civs.join(", ");
+    const truncated = civs.length > 39;
+    console.log(
+      `  ${pad(truncated ? `${g.civs.length} civs` : civs, 40)}${pad(g.row.unit.slice(0, 23), 24)}${num(g.row.result.unit.age, 4)}${num(w.projectiles, 5)}${num(w.baseDamage, 6)}` +
+        `${num("x" + round(w.multiplier), 7)}${num(w.interval, 8)}${num(round(w.perTarget[target].volley[stacking]), 9)}${num(round(g.dps), 8)}`,
+    );
+    // producedBy is the difference that matters for landmark units - the French build
+    // the Royal Cannon at the College of Artillery in Castle, Byzantines only via the
+    // Foreign Engineering Company in Imperial. Shown when it varies across groups.
+    // Never drop civ names: a long list moves to its own wrapped line rather than
+    // being cut off with an ellipsis.
+    if (truncated) console.log(wrap(civs, "      "));
+    if (multiProducer) console.log(`      produced at: ${[...g.producers].join(", ") || "-"}`);
+  }
+
   const all = rows.flatMap((r) => r.result.warnings.map((w) => `${r.civ}: [${w.kind}] ${w.subject}`));
   const unique = [...new Set(all)];
   if (unique.length) {

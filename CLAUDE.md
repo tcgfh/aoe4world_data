@@ -245,6 +245,11 @@ yarn analyse mechanics mongols                         # that civ's trait summar
 #        --volleys <n>  --travel <tiles>   (effective DPS over a siege cycle)
 ```
 
+- `rank` collapses civs with identical stats into one row and shows `age` +
+  `producedBy`. Ties are real and common — the Royal Cannon is numerically identical
+  for French, Jeanne d'Arc and Byzantines, and only availability separates them
+  (French build it at the College of Artillery in Castle; Byzantines only via the
+  Foreign Engineering Company in Imperial). Ties break toward the earlier age.
 - `derive.ts` holds the logic (selector matching, the reverse index, stat derivation);
   `cli.ts` is only presentation. Import `derive.ts` directly for ad-hoc queries.
 - Runs on plain Node via native type stripping — no `ts-node`, no `node_modules`. It
