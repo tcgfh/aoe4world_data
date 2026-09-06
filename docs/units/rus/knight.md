@@ -1,0 +1,163 @@
+# Early Knight
+
+Expensive cavalry with high damage and melee armor. Effective against melee units.
+
+- **+** Heavy armor
+- **+** Strong in melee combat
+- **−** Countered by Spearmen and Crossbowmen
+
+![Early Knight](https://data.aoe4world.com/images/units/knight-2.png)
+
+## Overview
+
+| Field | Value |
+| --- | --- |
+| ID | `knight` |
+| Type | Unit |
+| Civilization | Rus (ru) |
+| Unique | No |
+| Display class | Heavy Melee Cavalry |
+| Minimum age | II (Feudal) |
+| Produced by | stable |
+
+**Classes:** annihilation_condition, armored, cavalry, cavalry_armored, find_non_siege_land_military, formational, heavy, horse, human, included_by_military_hotkeys, knight, land_military, military, torch_thrower
+
+## Variations
+
+| Age | Name | ID | Hitpoints | Armor | Weapon | Damage | Attack speed | Range | Move speed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| II | Early Knight | `knight-2` | 190 | M3, R3 | Sword | 19 | 1.5 | 0–0.2875 | 1.625 |
+| III | Knight | `knight-3` | 230 | M4, R4 | Sword | 24 | 1.5 | 0–0.2875 | 1.625 |
+| IV | Elite Knight | `knight-4` | 270 | M5, R5 | Sword | 29 | 1.5 | 0–0.2875 | 1.625 |
+
+Cost is identical at every age: **140 food + 100 gold (total 240)**, **35s** build time, **1** population.
+
+### Early Knight (Age II)
+
+| Field | Value |
+| --- | --- |
+| ID | `knight-2` |
+| pbgid | 133509 |
+| attribName | `unit_knight_2_rus` |
+| Hitpoints | 190 |
+| Cost | 140 food + 100 gold (total 240) |
+| Build time | 35s |
+| Population | 1 |
+| Produced by | stable |
+| Movement speed | 1.625 |
+| Armor | Melee 3, Ranged 3 |
+| Icon | https://data.aoe4world.com/images/units/knight-2.png |
+
+**Sword** — melee (`weapon_knight_2_rus`, pbgid 133280)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 19 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Poleax** — melee (`weapon_knight_2_axe_rus`, pbgid 2133556)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 19 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Torch** — fire (`weapon_torch_horseman`, pbgid 127935)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 13.6, line 28, height 10 (inner radius 4 / height 10, outer radius 28 / height -15)
+
+### Knight (Age III)
+
+| Field | Value |
+| --- | --- |
+| ID | `knight-3` |
+| pbgid | 133462 |
+| attribName | `unit_knight_3_rus` |
+| Hitpoints | 230 |
+| Cost | 140 food + 100 gold (total 240) |
+| Build time | 35s |
+| Population | 1 |
+| Produced by | stable |
+| Movement speed | 1.625 |
+| Armor | Melee 4, Ranged 4 |
+| Icon | https://data.aoe4world.com/images/units/knight-3.png |
+
+**Sword** — melee (`weapon_knight_3_rus`, pbgid 133278)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 24 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Poleax** — melee (`weapon_knight_3_axe_rus`, pbgid 2133555)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 24 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Torch** — fire (`weapon_torch_horseman`, pbgid 127935)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 13.6, line 28, height 10 (inner radius 4 / height 10, outer radius 28 / height -15)
+
+### Elite Knight (Age IV)
+
+| Field | Value |
+| --- | --- |
+| ID | `knight-4` |
+| pbgid | 133463 |
+| attribName | `unit_knight_4_rus` |
+| Hitpoints | 270 |
+| Cost | 140 food + 100 gold (total 240) |
+| Build time | 35s |
+| Population | 1 |
+| Produced by | stable |
+| Movement speed | 1.625 |
+| Armor | Melee 5, Ranged 5 |
+| Icon | https://data.aoe4world.com/images/units/knight-4.png |
+
+**Sword** — melee (`weapon_knight_4_rus`, pbgid 133279)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 29 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Poleax** — melee (`weapon_knight_4_axe_rus`, pbgid 2133554)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 29 | 1.5 | 0–0.2875 |
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 0.875
+
+**Torch** — fire (`weapon_torch_horseman`, pbgid 127935)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 13.6, line 28, height 10 (inner radius 4 / height 10, outer radius 28 / height -15)
+
+---
+
+Source: autogenerated AoE4 data — see https://data.aoe4world.com/. Regenerate with `python3 scripts/units_to_markdown.py`.

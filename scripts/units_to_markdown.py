@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Convert per-civ unit JSON files into human-readable markdown pages.
 
-Usage: python3 scripts/units_to_markdown.py <civ-folder> <output-folder>
+Usage:
+  python3 scripts/units_to_markdown.py                       # all civs -> docs/units/
+  python3 scripts/units_to_markdown.py <src> <dst> [civ name] # a single civ folder
 Example: python3 scripts/units_to_markdown.py units/templar docs/units/templar
 """
 
@@ -28,6 +30,8 @@ def cost_line(costs):
 
 
 def fmt(value):
+    if value is None:
+        return "—"
     if isinstance(value, float) and value.is_integer():
         return str(int(value))
     return str(value)
@@ -229,11 +233,15 @@ def render_unit(base_id, variations, civ_name):
     return "\n".join(out)
 
 
-def main():
-    src = sys.argv[1] if len(sys.argv) > 1 else "units/templar"
-    dst = sys.argv[2] if len(sys.argv) > 2 else "docs/units/templar"
-    civ_name = sys.argv[3] if len(sys.argv) > 3 else "Knights Templar"
+def civ_display_name(folder):
+    path = os.path.join("civilizations", f"{folder}.json")
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f).get("name", folder)
+    return folder
 
+
+def generate_civ(src, dst, civ_name):
     groups = defaultdict(list)
     for fname in sorted(os.listdir(src)):
         if not fname.endswith(".json"):
@@ -258,6 +266,44 @@ def main():
         f.write("\n".join(index))
 
     print(f"Wrote {len(written)} unit pages to {dst}")
+    return len(written)
+
+
+def main():
+    if len(sys.argv) > 1:
+        src = sys.argv[1]
+        dst = sys.argv[2] if len(sys.argv) > 2 else os.path.join("docs/units", os.path.basename(src.rstrip("/")))
+        civ_name = sys.argv[3] if len(sys.argv) > 3 else civ_display_name(os.path.basename(src.rstrip("/")))
+        generate_civ(src, dst, civ_name)
+        return
+
+    civs = sorted(
+        d
+        for d in os.listdir("units")
+        if os.path.isdir(os.path.join("units", d)) and d != "unified"
+    )
+    counts = []
+    for folder in civs:
+        name = civ_display_name(folder)
+        n = generate_civ(os.path.join("units", folder), os.path.join("docs/units", folder), name)
+        counts.append((name, folder, n))
+
+    index = [
+        "# Unit reference",
+        "",
+        "Markdown pages generated from the unit JSON data, one folder per civilization.",
+        "",
+        "| Civilization | Units | Pages |",
+        "| --- | --- | --- |",
+    ]
+    for name, folder, n in sorted(counts):
+        index.append(f"| {name} | {n} | [`{folder}/`](./{folder}/README.md) |")
+    index.append("")
+    index.append("Regenerate everything with `python3 scripts/units_to_markdown.py`.")
+    index.append("")
+    with open("docs/units/README.md", "w") as f:
+        f.write("\n".join(index))
+    print(f"Wrote index for {len(counts)} civilizations")
 
 
 if __name__ == "__main__":

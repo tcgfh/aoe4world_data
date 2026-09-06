@@ -1,0 +1,153 @@
+# Mansa Musofadi Warrior
+
+Infantry effective at ambush attacks and countering heavy targets. Has additional melee armor and health.
+
+- **+** Can enter stealth
+- **+** Anti-heavy specialist
+- **−** Low health
+- **−** Countered by Archers
+- **−** Capital Town Centers, Outposts, and Scouts can spot stealth
+
+![Mansa Musofadi Warrior](https://data.aoe4world.com/images/units/mansa-musofadi-warrior-2.png)
+
+## Overview
+
+| Field | Value |
+| --- | --- |
+| ID | `mansa-musofadi-warrior` |
+| Type | Unit |
+| Civilization | Malians (ma) |
+| Unique | Yes |
+| Display class | Light Melee Infantry |
+| Minimum age | II (Feudal) |
+| Produced by | barracks, farimba-garrison |
+
+**Classes:** annihilation_condition, find_non_siege_land_military, formational, human, included_by_military_hotkeys, infantry, infantry_light, land_military, light_melee_infantry, melee, melee_infantry, military, musofadi_stealth, musofadi_warrior, torch_thrower
+
+## Variations
+
+| Age | Name | ID | Hitpoints | Armor | Weapon | Damage | Attack speed | Range | Move speed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| II | Mansa Musofadi Warrior | `mansa-musofadi-warrior-2` | 105 | M4 | Khanda | 9 | 1.375 | 0–0.295 | 1.375 |
+| III | Veteran Mansa Musofadi Warrior | `mansa-musofadi-warrior-3` | 125 | M5 | Khanda | 10 | 1.375 | 0–0.295 | 1.375 |
+| IV | Elite Mansa Musofadi Warrior | `mansa-musofadi-warrior-4` | 150 | M6 | Khanda | 13 | 1.375 | 0–0.295 | 1.375 |
+
+Cost is identical at every age: **45 food + 30 gold (total 75)**, **15s** build time, **1** population.
+
+### Mansa Musofadi Warrior (Age II)
+
+| Field | Value |
+| --- | --- |
+| ID | `mansa-musofadi-warrior-2` |
+| pbgid | 9000337 |
+| attribName | `unit_mansa_musofadi_2_mal` |
+| Hitpoints | 105 |
+| Cost | 45 food + 30 gold (total 75) |
+| Build time | 15s |
+| Population | 1 |
+| Produced by | barracks, farimba-garrison |
+| Movement speed | 1.375 |
+| Armor | Melee 4 |
+| Icon | https://data.aoe4world.com/images/units/mansa-musofadi-warrior-2.png |
+
+**Khanda** — melee (`weapon_mansa_musofadi_2_mal`, pbgid 9000346)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 9 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +10 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+### Veteran Mansa Musofadi Warrior (Age III)
+
+| Field | Value |
+| --- | --- |
+| ID | `mansa-musofadi-warrior-3` |
+| pbgid | 9000338 |
+| attribName | `unit_mansa_musofadi_3_mal` |
+| Hitpoints | 125 |
+| Cost | 45 food + 30 gold (total 75) |
+| Build time | 15s |
+| Population | 1 |
+| Produced by | barracks, farimba-garrison |
+| Movement speed | 1.375 |
+| Armor | Melee 5 |
+| Icon | https://data.aoe4world.com/images/units/mansa-musofadi-warrior-3.png |
+
+**Khanda** — melee (`weapon_mansa_musofadi_3_mal`, pbgid 9000348)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +15 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+### Elite Mansa Musofadi Warrior (Age IV)
+
+| Field | Value |
+| --- | --- |
+| ID | `mansa-musofadi-warrior-4` |
+| pbgid | 9000339 |
+| attribName | `unit_mansa_musofadi_4_mal` |
+| Hitpoints | 150 |
+| Cost | 45 food + 30 gold (total 75) |
+| Build time | 15s |
+| Population | 1 |
+| Produced by | barracks, farimba-garrison |
+| Movement speed | 1.375 |
+| Armor | Melee 6 |
+| Icon | https://data.aoe4world.com/images/units/mansa-musofadi-warrior-4.png |
+
+**Khanda** — melee (`weapon_mansa_musofadi_4_mal`, pbgid 9000350)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 13 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +18 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+---
+
+Source: autogenerated AoE4 data — see https://data.aoe4world.com/. Regenerate with `python3 scripts/units_to_markdown.py`.
