@@ -1,0 +1,155 @@
+# Musofadi Warrior
+
+Infantry effective at ambush attacks and countering heavy targets.
+
+- **+** Can enter stealth
+- **+** Anti-heavy specialist
+- **−** Low health
+- **−** Countered by Archers
+- **−** Capital Town Centers, Outposts, and Scouts can spot stealth
+- Mercenary that can be purchased per 5 units for a total of 360 Olive Oil.
+- This Mercenary can only be purchased on Mercenary Houses built near a neutral Trade Post that list this unit. The chance of this unit being available on a Trade Post is 20%.
+
+![Musofadi Warrior](https://data.aoe4world.com/images/units/musofadi-warrior-2.png)
+
+## Overview
+
+| Field | Value |
+| --- | --- |
+| ID | `musofadi-warrior` |
+| Type | Unit |
+| Civilization | Byzantines (by) |
+| Unique | No |
+| Display class | Light Melee Infantry |
+| Minimum age | II (Feudal) |
+| Produced by | golden-horn-tower, mercenary-house |
+
+**Classes:** annihilation_condition, formational, human, included_by_military_hotkeys, infantry, light_melee_infantry, melee, melee_infantry, mercenary_byz, military, musofadi_stealth, musofadi_warrior, torch_thrower
+
+## Variations
+
+| Age | Name | ID | Hitpoints | Armor | Weapon | Damage | Attack speed | Range | Move speed |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| II | Musofadi Warrior | `musofadi-warrior-2` | 95 | — | Khanda | 8 | 1.375 | 0–0.295 | 1.375 |
+| III | Veteran Musofadi Warrior | `musofadi-warrior-3` | 115 | — | Khanda | 9 | 1.375 | 0–0.295 | 1.375 |
+| IV | Elite Musofadi Warrior | `musofadi-warrior-4` | 140 | — | Khanda | 12 | 1.375 | 0–0.295 | 1.375 |
+
+Cost is identical at every age: **free**, **68s** build time, **1** population.
+
+### Musofadi Warrior (Age II)
+
+| Field | Value |
+| --- | --- |
+| ID | `musofadi-warrior-2` |
+| pbgid | 2104190 |
+| attribName | `unit_gbeto_2_merc_byz` |
+| Hitpoints | 95 |
+| Cost | free |
+| Build time | 68s |
+| Population | 1 |
+| Produced by | golden-horn-tower, mercenary-house |
+| Movement speed | 1.375 |
+| Armor | none |
+| Icon | https://data.aoe4world.com/images/units/musofadi-warrior-2.png |
+
+**Khanda** — melee (`weapon_manatarms_2_mal`, pbgid 2072969)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 8 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +10 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+### Veteran Musofadi Warrior (Age III)
+
+| Field | Value |
+| --- | --- |
+| ID | `musofadi-warrior-3` |
+| pbgid | 2104191 |
+| attribName | `unit_gbeto_3_merc_byz` |
+| Hitpoints | 115 |
+| Cost | free |
+| Build time | 68s |
+| Population | 1 |
+| Produced by | golden-horn-tower, mercenary-house |
+| Movement speed | 1.375 |
+| Armor | none |
+| Icon | https://data.aoe4world.com/images/units/musofadi-warrior-3.png |
+
+**Khanda** — melee (`weapon_manatarms_3_mal`, pbgid 2072743)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 9 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +15 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+### Elite Musofadi Warrior (Age IV)
+
+| Field | Value |
+| --- | --- |
+| ID | `musofadi-warrior-4` |
+| pbgid | 2104192 |
+| attribName | `unit_gbeto_4_merc_byz` |
+| Hitpoints | 140 |
+| Cost | free |
+| Build time | 68s |
+| Population | 1 |
+| Produced by | golden-horn-tower, mercenary-house |
+| Movement speed | 1.375 |
+| Armor | none |
+| Icon | https://data.aoe4world.com/images/units/musofadi-warrior-4.png |
+
+**Khanda** — melee (`weapon_manatarms_4_mal`, pbgid 2072747)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 12 | 1.375 | 0–0.295 |
+
+Modifiers:
+
+- meleeAttack +18 vs heavy (passive)
+
+Durations: aim 0, windup 0.5, attack 0.125, winddown 0.75, reload 0, setup 0, teardown 0, cooldown 0
+
+**Torch** — fire (`weapon_torch`, pbgid 123518)
+
+| Damage | Attack speed | Range (min–max) |
+| --- | --- | --- |
+| 10 | 2.125 | 0–1.25 |
+
+Durations: aim 0, windup 0.75, attack 0.125, winddown 0, reload 0, setup 0, teardown 0, cooldown 1.25
+
+**Sight:** base 21.6, line 36, height 10 (inner radius 12 / height 10, outer radius 36 / height -15)
+
+---
+
+Source: autogenerated AoE4 data — see https://data.aoe4world.com/. Regenerate with `python3 scripts/units_to_markdown.py`.
